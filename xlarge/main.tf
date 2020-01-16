@@ -28,14 +28,14 @@ resource "random_id" "deployment" {
 
 # Contain all the networking configuration in a module for readability
 module "networking" {
-  source = "./modules/networking"
+  source = "../modules/networking"
   id     = random_id.deployment.hex
   allow  = var.firewall_allow
 }
 
 # Contain all the loadbalancer configuration in a module for readability
 module "loadbalancer" {
-  source     = "./modules/loadbalancer"
+  source     = "../modules/loadbalancer"
   id         = random_id.deployment.hex
   ports      = ["8140", "8142"]
   network    = module.networking.network_link
