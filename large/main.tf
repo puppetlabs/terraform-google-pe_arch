@@ -1,20 +1,3 @@
-# GCP Project ID
-variable "project"        { }
-# Shared user name across instances
-variable "user"           { }
-# Location on disk of the SSH key to use for system access
-variable "ssh_key"        { default = "~/.ssh/id_rsa.pub" }
-# GCP region for the deployment
-variable "region"         { default = "us-west1" }
-# GCP zones for the deployment
-variable "zones"          { default = [ "us-west1-a", "us-west1-b", "us-west1-c" ] }
-# Number of compilers to deploy, will be spread across all defined zones
-variable "compiler_count" { default = 3 }
-# The instance image to deploy from
-variable "instance_image"    { default = "centos-cloud/centos-7" }
-# Permitted IP subnets, default is internal only, single IP adresses should be defined as /32
-variable "firewall_allow" { default = [ "10.128.0.0/9" ] }
-
 provider "google" {
   project = var.project
   region  = var.region
@@ -123,22 +106,4 @@ resource "google_compute_instance" "compiler" {
     }
     inline = ["# Connected"]
   }
-}
-
-# Output data used by Bolt to do further work, doing this allows for a clean
-# and abstracted interface between cloud provider implementation
-output "console" {
-  value       = google_compute_instance.master[0].network_interface[0].access_config[0].nat_ip
-  description = "The external IP address of the Pupept Enterprise console"
-}
-output "pool" {
-  value       = module.loadbalancer.lb_dns_name
-  description = "The internal FQDN of the Pupept Enterprise compiler pool"
-}
-output "infrastructure" {
-  value = { 
-    masters   : [for i in google_compute_instance.master[*]   : [ "${i.name}.${i.zone}.c.${i.project}.internal", i.network_interface[0].access_config[0].nat_ip] ], 
-    compilers : [for i in google_compute_instance.compiler[*] : [ "${i.name}.${i.zone}.c.${i.project}.internal", i.network_interface[0].access_config[0].nat_ip] ] 
-  }
-  description = "A collection of internal DNS names and IP addresses of PE infrastructure components"
 }

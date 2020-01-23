@@ -1,11 +1,3 @@
-variable id         {}
-variable ports      {}      
-variable network    {}    
-variable subnetwork {} 
-variable region     {}     
-variable zones      {}      
-variable instances  {}      
-
 resource "google_compute_instance_group" "backend" {
   for_each = toset(var.zones)
   name  = "pe-compiler-${var.id}"

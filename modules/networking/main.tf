@@ -1,6 +1,3 @@
- variable id    {}
- variable allow {}
-
 # To contain each PE deployment, a fresh VPC to deploy into
 resource "google_compute_network" "pe" {
   name = "pe-${var.id}"

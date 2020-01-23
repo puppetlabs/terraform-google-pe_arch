@@ -1,0 +1,2 @@
+ variable id    {}
+ variable allow {}
