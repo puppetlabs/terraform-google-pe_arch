@@ -1,44 +1,15 @@
-provider "google" {
-  project = var.project
-  region  = var.region
-}
-
-# It is intended that multiple deployments can be launched easily without
-# name colliding
-resource "random_id" "deployment" {
-  byte_length = 3
-}
-
-# Contain all the networking configuration in a module for readability
-module "networking" {
-  source = "../modules/networking"
-  id     = random_id.deployment.hex
-  allow  = var.firewall_allow
-}
-
-# Contain all the loadbalancer configuration in a module for readability
-module "loadbalancer" {
-  source     = "../modules/loadbalancer"
-  id         = random_id.deployment.hex
-  ports      = ["8140", "8142"]
-  network    = module.networking.network_link
-  subnetwork = module.networking.subnetwork_link
-  region     = var.region
-  zones      = var.zones
-  instances  = google_compute_instance.compiler[*]
-}
-
 # Instances to run PE MOM
 resource "google_compute_instance" "master" {
-  name         = "pe-master-${random_id.deployment.hex}-${count.index}"
+  name         = "pe-master-${var.id}-${count.index}"
   machine_type = "e2-standard-4"
-  count        = 2
+  count        = var.architecture == "xlarge" ? 2 : 1
   zone         = element(var.zones, count.index)
 
   # Old style internal DNS easiest until Bolt inventory dynamic
   metadata = {
     "sshKeys" = "${var.user}:${file(var.ssh_key)}"
     "VmDnsSetting" = "ZonalPreferred"
+    "internalDNS" = "pe-master-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
   }
 
   boot_disk {
@@ -50,12 +21,12 @@ resource "google_compute_instance" "master" {
   }
 
   network_interface {
-    network = module.networking.network_link
-    subnetwork = module.networking.subnetwork_link
+    network = var.network
+    subnetwork = var.subnetwork
     access_config { }
   }
 
-  # Using remote-execs on each instance deployemnt to ensure things are really
+  # Using remote-execs on each instance deployment to ensure things are really
   # really up before doing to the next step, helps with Bolt plans that'll
   # immediately connect then fail
   provisioner "remote-exec" {
@@ -70,15 +41,16 @@ resource "google_compute_instance" "master" {
 
 # Instances to run PE PSQL
 resource "google_compute_instance" "psql" {
-  name         = "pe-psql-${random_id.deployment.hex}-${count.index}"
+  name         = "pe-psql-${var.id}-${count.index}"
   machine_type = "e2-standard-8"
-  count        = 2
+  count        = var.architecture == "xlarge" ? 2 : 0
   zone         = element(var.zones, count.index)
 
   # Old style internal DNS easiest until Bolt inventory dynamic
   metadata = {
     "sshKeys" = "${var.user}:${file(var.ssh_key)}"
     "VmDnsSetting" = "ZonalPreferred"
+    "internalDNS" = "pe-psql-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
   }
 
   boot_disk {
@@ -90,12 +62,12 @@ resource "google_compute_instance" "psql" {
   }
 
   network_interface {
-    network = module.networking.network_link
-    subnetwork = module.networking.subnetwork_link
+    network = var.network
+    subnetwork = var.subnetwork
     access_config { }
   }
 
-  # Using remote-execs on each instance deployemnt to ensure things are really
+  # Using remote-execs on each instance deployment to ensure things are really
   # really up before doing to the next step, helps with Bolt plans that'll
   # immediately connect then fail
   provisioner "remote-exec" {
@@ -110,7 +82,7 @@ resource "google_compute_instance" "psql" {
 
 # Instances to run a compilers
 resource "google_compute_instance" "compiler" {
-  name         = "pe-compiler-${random_id.deployment.hex}-${count.index}"
+  name         = "pe-compiler-${var.id}-${count.index}"
   machine_type = "e2-standard-2"
   count        = var.compiler_count
   zone         = element(var.zones, count.index)
@@ -119,6 +91,7 @@ resource "google_compute_instance" "compiler" {
   metadata = {
     "sshKeys" = "${var.user}:${file(var.ssh_key)}"
     "VmDnsSetting" = "ZonalPreferred"
+    "internalDNS" = "pe-compiler-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
   }
 
   boot_disk {
@@ -130,12 +103,12 @@ resource "google_compute_instance" "compiler" {
   }
 
   network_interface {
-    network = module.networking.network_link
-    subnetwork = module.networking.subnetwork_link
+    network = var.network
+    subnetwork = var.subnetwork
     access_config { }
   }
 
-  # Using remote-execs on each instance deployemnt to ensure things are really
+  # Using remote-execs on each instance deployment to ensure things are really
   # really up before doing to the next step, helps with Bolt plans that'll
   # immediately connect then fail
   provisioner "remote-exec" {

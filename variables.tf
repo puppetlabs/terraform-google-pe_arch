@@ -31,9 +31,13 @@ variable "instance_image" {
   type        = string
   default     = "centos-cloud/centos-7"
 }
-# Permitted IP subnets, default is internal only, single IP adresses should be defined as /32
 variable "firewall_allow" {
   description = "List of permitted IP subnets, including the internal network is always required and single addresses must be passed as a /32"
   type        = list(string)
   default     = [ "10.128.0.0/9" ]
+}
+variable "architecture" {
+  description = "Which of the supported PE architectures modules to deploy infrastructure with"
+  type        = string
+  default     = "xlarge"
 }
