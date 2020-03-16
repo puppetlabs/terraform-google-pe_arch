@@ -84,7 +84,7 @@ resource "google_compute_instance" "psql" {
 resource "google_compute_instance" "compiler" {
   name         = "pe-compiler-${var.id}-${count.index}"
   machine_type = "e2-standard-2"
-  count        = var.compiler_count
+  count        = var.architecture == "standard" ? 0 : var.compiler_count
   zone         = element(var.zones, count.index)
 
   # Old style internal DNS easiest until Bolt inventory dynamic
