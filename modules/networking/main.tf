@@ -5,7 +5,8 @@ resource "google_compute_network" "pe" {
 }
 
 # Manual creation of subnets works better when instances are dependent on their
-# existance, allowing GCP to create them automatically creates a race condition.
+# existence and allowing GCP to create them automatically creates a race
+# condition
 resource "google_compute_subnetwork" "pe_west" {
   name          = "pe-${var.id}"
   ip_cidr_range = "10.138.0.0/20"
@@ -13,7 +14,7 @@ resource "google_compute_subnetwork" "pe_west" {
 }
 
 # Instances should not be accessible by the open internet so a fresh VPC should
-# be restricted to organization allowed subnets
+# be restricted to specific allowed subnets
 resource "google_compute_firewall" "pe_default" {
   name    = "pe-default-${var.id}"
   network = google_compute_network.pe.self_link

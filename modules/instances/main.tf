@@ -1,11 +1,13 @@
-# Instances to run PE MOM
+# PE MoM instances in xlarge and large or the only instance in standard
 resource "google_compute_instance" "master" {
   name         = "pe-master-${var.id}-${count.index}"
   machine_type = "e2-standard-4"
   count        = var.architecture == "xlarge" ? 2 : 1
   zone         = element(var.zones, count.index)
 
-  # Old style internal DNS easiest until Bolt inventory dynamic
+  # Constructing an FQDN from GCP convention for Zonal DNS and storing it as
+  # metadata so it is a property of the instance, making it easy to use later in
+  # Bolt
   metadata = {
     "sshKeys" = "${var.user}:${file(var.ssh_key)}"
     "VmDnsSetting" = "ZonalPreferred"
@@ -20,6 +22,8 @@ resource "google_compute_instance" "master" {
     }
   }
 
+  # Configuration of instances requires external IP address but it doesn't
+  # matter what they are so dynamic sourcing them from global pool is ok
   network_interface {
     network = var.network
     subnetwork = var.subnetwork
@@ -39,14 +43,19 @@ resource "google_compute_instance" "master" {
   }
 }
 
+# Reasons given for what is happening in each reason block are they same as
+# those given for the MoM instances, from a pure "infrastructure" perspective
+# all the components of a PE stack are very similar
+
 # Instances to run PE PSQL
 resource "google_compute_instance" "psql" {
   name         = "pe-psql-${var.id}-${count.index}"
   machine_type = "e2-standard-8"
+  # count is used to effectively "no-op" this resource in the event that we
+  # deploy any architecture other than xlarge
   count        = var.architecture == "xlarge" ? 2 : 0
   zone         = element(var.zones, count.index)
 
-  # Old style internal DNS easiest until Bolt inventory dynamic
   metadata = {
     "sshKeys" = "${var.user}:${file(var.ssh_key)}"
     "VmDnsSetting" = "ZonalPreferred"
@@ -67,9 +76,6 @@ resource "google_compute_instance" "psql" {
     access_config { }
   }
 
-  # Using remote-execs on each instance deployment to ensure things are really
-  # really up before doing to the next step, helps with Bolt plans that'll
-  # immediately connect then fail
   provisioner "remote-exec" {
     connection {
       host = self.network_interface[0].access_config[0].nat_ip
@@ -80,14 +86,15 @@ resource "google_compute_instance" "psql" {
   }
 }
 
-# Instances to run a compilers
+# Instances to run as compilers
 resource "google_compute_instance" "compiler" {
   name         = "pe-compiler-${var.id}-${count.index}"
   machine_type = "e2-standard-2"
-  count        = var.compiler_count
+  # count is used to effectively "no-op" this resource in the event that we
+  # deploy the standard architecture
+  count        = var.architecture == "standard" ? 0 : var.compiler_count
   zone         = element(var.zones, count.index)
 
-  # Old style internal DNS easiest until Bolt inventory dynamic
   metadata = {
     "sshKeys" = "${var.user}:${file(var.ssh_key)}"
     "VmDnsSetting" = "ZonalPreferred"
@@ -108,9 +115,6 @@ resource "google_compute_instance" "compiler" {
     access_config { }
   }
 
-  # Using remote-execs on each instance deployment to ensure things are really
-  # really up before doing to the next step, helps with Bolt plans that'll
-  # immediately connect then fail
   provisioner "remote-exec" {
     connection {
       host = self.network_interface[0].access_config[0].nat_ip
