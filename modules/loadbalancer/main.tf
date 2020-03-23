@@ -1,3 +1,4 @@
+# Create an instance group per zone to attach that zone's compilers to
 resource "google_compute_instance_group" "backend" {
   for_each  = var.architecture == "standard" ? [] : toset(var.zones)
   name      = "pe-compiler-${var.id}"
@@ -5,6 +6,8 @@ resource "google_compute_instance_group" "backend" {
   zone      = each.value
 }
 
+# Define a health check that'll indicate the health of a compiler node, very
+# irritating that this is a 1:1 mapping of front end IP to port
 resource "google_compute_health_check" "pe_compiler" {
   count = var.architecture == "standard" ? 0 : 1 
   name  = "pe-compiler-${var.id}"
@@ -12,6 +15,7 @@ resource "google_compute_health_check" "pe_compiler" {
   tcp_health_check { port = var.ports[0] }
 }
 
+# The backend service that bundles together all the zonal instance groups
 resource "google_compute_region_backend_service" "pe_compiler_lb" {
   count         = var.architecture == "standard" ? 0 : 1 
   name          = "pe-compiler-lb-${var.id}"
@@ -25,6 +29,8 @@ resource "google_compute_region_backend_service" "pe_compiler_lb" {
   }
 }
 
+# Rule that defines what type of load balancing will be used and the network it
+# will source an IP from
 resource "google_compute_forwarding_rule" "pe_compiler_lb" {
   count                 = var.architecture == "standard" ? 0 : 1 
   name                  = "pe-compiler-lb-${var.id}"

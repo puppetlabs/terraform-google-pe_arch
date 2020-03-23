@@ -1,10 +1,16 @@
+# The module makes repeated use of the try() function so requires a very recent
+# release of Terraform 0.12
+terraform {
+  required_version = ">= 0.12.20"
+}
+
 provider "google" {
   project = var.project
   region  = var.region
 }
 
 # It is intended that multiple deployments can be launched easily without
-# name colliding
+# name collisions
 resource "random_id" "deployment" {
   byte_length = 3
 }
@@ -29,8 +35,7 @@ module "loadbalancer" {
   architecture   = var.architecture
 }
 
-# Instance module called from a dynamic source dependent on deploying 
-# architecture
+# Contain all the instances configuration in a module for readability
 module "instances" {
   source         = "./modules/instances"
   id             = random_id.deployment.hex

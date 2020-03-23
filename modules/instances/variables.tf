@@ -1,32 +1,45 @@
-variable "id" {
-  description = "Name of GCP project that will be used for housing require infrastructure"
-  type        = string
-}
-variable "user" { 
+# These are the variables required for the instances submodule to function
+# properly and are duplicated highly from the main module but instead do not
+# have any defaults set because this submodule should never by called from
+# anything else expect the main module where values for all these variables will
+# always be passed in
+variable "user" {
   description = "Instance user name that will used for SSH operations"
   type        = string
 }
 variable "ssh_key" {
   description = "Location on disk of the SSH public key to be used for instance SSH access"
   type        = string
-  default     = "~/.ssh/id_rsa.pub"
 }
 variable "zones" {
   description = "GCP zone that are within the defined GCP region that you wish to use"
   type        = list(string)
-  default     = [ "us-west1-a", "us-west1-b", "us-west1-c" ]
 }
 variable "compiler_count" {
   description = "The quantity of compilers that are deployed behind a load balancer and will be spread across defined zones"
   type        = number
-  default     = 3
 }
 variable "instance_image" {
   description = "The disk image to use when deploying new cloud instances"
   type        = string
-  default     = "centos-cloud/centos-7"
 }
-variable network    {}    
-variable subnetwork {} 
-variable project {} 
-variable architecture {} 
+variable "project" {
+  description = "Name of GCP project that will be used for housing require infrastructure"
+  type        = string
+}
+variable "architecture" {
+  description = "Which of the supported PE architectures modules to deploy xlarge, large, or standard"
+  type        = string
+}
+variable network    {
+  description = "VPC network provisioned by the networking submodule"
+  type        = string
+}
+variable subnetwork {
+  description = "Regional subnetwork assigned to VPC network provisioned by the networking submodule"
+  type        = string
+}
+variable "id" {
+  description = "Randomly generated value used to produce unique names for everything to prevent collisions and visually link resources together"
+  type        = string
+}
