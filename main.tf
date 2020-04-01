@@ -9,6 +9,16 @@ provider "google" {
   region  = var.region
 }
 
+# Retrieve list of zones to deploy to to prevent needing to know what they are
+# for each region
+data "google_compute_zones" "available" { }
+
+# Short name for addressing the list of zones for the region
+locals {
+  zones   = data.google_compute_zones.available.names
+  allowed = concat(["10.128.0.0/9"], var.firewall_allow)
+}
+
 # It is intended that multiple deployments can be launched easily without
 # name collisions
 resource "random_id" "deployment" {
@@ -19,7 +29,7 @@ resource "random_id" "deployment" {
 module "networking" {
   source = "./modules/networking"
   id     = random_id.deployment.hex
-  allow  = var.firewall_allow
+  allow  = local.allowed
 }
 
 # Contain all the loadbalancer configuration in a module for readability
@@ -30,7 +40,7 @@ module "loadbalancer" {
   network        = module.networking.network_link
   subnetwork     = module.networking.subnetwork_link
   region         = var.region
-  zones          = var.zones
+  zones          = local.zones
   instances      = module.instances.compilers
   architecture   = var.architecture
 }
@@ -41,7 +51,7 @@ module "instances" {
   id             = random_id.deployment.hex
   network        = module.networking.network_link
   subnetwork     = module.networking.subnetwork_link
-  zones          = var.zones
+  zones          = local.zones
   user           = var.user
   ssh_key        = var.ssh_key
   compiler_count = var.compiler_count

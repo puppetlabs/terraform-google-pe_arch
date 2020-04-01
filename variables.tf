@@ -16,11 +16,6 @@ variable "region" {
   type        = string
   default     = "us-west1"
 }
-variable "zones" {
-  description = "GCP zone that are within the defined GCP region that you wish to use"
-  type        = list(string)
-  default     = [ "us-west1-a", "us-west1-b", "us-west1-c" ]
-}
 variable "compiler_count" {
   description = "The quantity of compilers that are deployed behind a load balancer and will be spread across defined zones"
   type        = number
@@ -34,7 +29,7 @@ variable "instance_image" {
 variable "firewall_allow" {
   description = "List of permitted IP subnets, list most include the internal network and single addresses must be passed as a /32"
   type        = list(string)
-  default     = [ "10.128.0.0/9" ]
+  default     = []
 }
 variable "architecture" {
   description = "Which of the supported PE architectures modules to deploy xlarge, large, or standard"
