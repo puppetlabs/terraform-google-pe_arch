@@ -47,9 +47,9 @@ Types of things you'll be paying your cloud provider for
 
 ### Example: deploy standard architecture with a more restrictive network
 
-This will give you the absolute minimum needed for installing Puppet Enterprise, a single VM plus a specific network for it to reside within and limited to a specific network that have access to the new infrastructure (note: don't forget to include the local network, if you use [puppetlabs/autope](https://github.com/puppetlabs/puppetlabs-autope/blob/master/Boltdir/site-modules/autope/plans/init.pp#L19) then this will be done automatically)
+This will give you the absolute minimum needed for installing Puppet Enterprise, a single VM plus a specific network for it to reside within and limited to a specific network that have access to the new infrastructure (note: internal network will always be injected into the list)
 
-`terraform apply -auto-approve -var "project=example.com" -var "user=john.doe" -var "firewall_allow=[ \"10.128.0.0/9\", \"192.69.65.0/24\" ]" -var architecture=standard`
+`terraform apply -auto-approve -var "project=example.com" -var "user=john.doe" -var "firewall_allow=[ \"192.69.65.0/24\" ]" -var architecture=standard`
 
 ### Example: destroy stack
 
