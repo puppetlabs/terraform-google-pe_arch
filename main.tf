@@ -11,11 +11,14 @@ provider "google" {
 
 # Retrieve list of zones to deploy to to prevent needing to know what they are
 # for each region
-data "google_compute_zones" "available" { }
+data "google_compute_zones" "available" {
+  count = var.destroy ? 0 : 1
+  status = "UP"
+ }
 
 # Short name for addressing the list of zones for the region
 locals {
-  zones   = data.google_compute_zones.available.names
+  zones   = try(data.google_compute_zones.available[0].names, ["a","b","c"])
   allowed = concat(["10.128.0.0/9"], var.firewall_allow)
 }
 
