@@ -36,3 +36,8 @@ variable "architecture" {
   type        = string
   default     = "xlarge"
 }
+variable "destroy" {
+  description = "Available to facilitate simplified destroy via Puppet Bolt, irrelevant outside specific use case"
+  type        = bool
+  default     = false
+}
