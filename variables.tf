@@ -20,6 +20,11 @@ variable "compiler_count" {
   description = "The quantity of compilers that are deployed behind a load balancer and will be spread across defined zones"
   type        = number
   default     = 3
+
+  validation {
+    condition     = var.compiler_count >= 3
+    error_message = "The compiler_count variable must be greater or equal to 3."
+  }
 }
 variable "instance_image" {
   description = "The disk image to use when deploying new cloud instances"
