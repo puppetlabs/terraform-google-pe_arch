@@ -104,7 +104,7 @@ resource "google_compute_instance" "compiler" {
   boot_disk {
     initialize_params {
       image = var.instance_image
-      size  = 15
+      size  = 25
       type  = "pd-ssd"
     }
   }
