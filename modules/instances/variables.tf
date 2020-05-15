@@ -19,6 +19,10 @@ variable "compiler_count" {
   description = "The quantity of compilers that are deployed behind a load balancer and will be spread across defined zones"
   type        = number
 }
+variable "node_count" {
+  description = "The quantity of nodes that are deployed within the environment for testing"
+  type        = number
+}
 variable "instance_image" {
   description = "The disk image to use when deploying new cloud instances"
   type        = string
