@@ -9,9 +9,9 @@ resource "google_compute_instance" "master" {
   # metadata so it is a property of the instance, making it easy to use later in
   # Bolt
   metadata = {
-    "sshKeys" = "${var.user}:${file(var.ssh_key)}"
+    "sshKeys"      = "${var.user}:${file(var.ssh_key)}"
     "VmDnsSetting" = "ZonalPreferred"
-    "internalDNS" = "pe-master-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
+    "internalDNS"  = "pe-master-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
   }
 
   boot_disk {
@@ -25,7 +25,7 @@ resource "google_compute_instance" "master" {
   # Configuration of instances requires external IP address but it doesn't
   # matter what they are so dynamic sourcing them from global pool is ok
   network_interface {
-    network = var.network
+    network    = var.network
     subnetwork = var.subnetwork
     access_config { }
   }
@@ -35,9 +35,9 @@ resource "google_compute_instance" "master" {
   # immediately connect then fail
   provisioner "remote-exec" {
     connection {
-      host = self.network_interface[0].access_config[0].nat_ip
-      type = "ssh"
-      user = var.user
+      host        = self.network_interface[0].access_config[0].nat_ip
+      type        = "ssh"
+      user        = var.user
     }
     inline = ["# Connected"]
   }
@@ -57,9 +57,9 @@ resource "google_compute_instance" "psql" {
   zone         = element(var.zones, count.index)
 
   metadata = {
-    "sshKeys" = "${var.user}:${file(var.ssh_key)}"
+    "sshKeys"      = "${var.user}:${file(var.ssh_key)}"
     "VmDnsSetting" = "ZonalPreferred"
-    "internalDNS" = "pe-psql-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
+    "internalDNS"  = "pe-psql-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
   }
 
   boot_disk {
@@ -71,16 +71,16 @@ resource "google_compute_instance" "psql" {
   }
 
   network_interface {
-    network = var.network
+    network    = var.network
     subnetwork = var.subnetwork
     access_config { }
   }
 
   provisioner "remote-exec" {
     connection {
-      host = self.network_interface[0].access_config[0].nat_ip
-      type = "ssh"
-      user = var.user
+      host        = self.network_interface[0].access_config[0].nat_ip
+      type        = "ssh"
+      user        = var.user
     }
     inline = ["# Connected"]
   }
@@ -96,9 +96,9 @@ resource "google_compute_instance" "compiler" {
   zone         = element(var.zones, count.index)
 
   metadata = {
-    "sshKeys" = "${var.user}:${file(var.ssh_key)}"
+    "sshKeys"      = "${var.user}:${file(var.ssh_key)}"
     "VmDnsSetting" = "ZonalPreferred"
-    "internalDNS" = "pe-compiler-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
+    "internalDNS"  = "pe-compiler-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
   }
 
   boot_disk {
@@ -110,16 +110,16 @@ resource "google_compute_instance" "compiler" {
   }
 
   network_interface {
-    network = var.network
+    network    = var.network
     subnetwork = var.subnetwork
     access_config { }
   }
 
   provisioner "remote-exec" {
     connection {
-      host = self.network_interface[0].access_config[0].nat_ip
-      type = "ssh"
-      user = var.user
+      host        = self.network_interface[0].access_config[0].nat_ip
+      type        = "ssh"
+      user        = var.user
     }
     inline = ["# Connected"]
   }

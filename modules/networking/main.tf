@@ -1,6 +1,6 @@
 # To contain each PE deployment, a fresh VPC to deploy into
 resource "google_compute_network" "pe" {
-  name = "pe-${var.id}"
+  name                    = "pe-${var.id}"
   auto_create_subnetworks = false
 }
 
@@ -16,9 +16,9 @@ resource "google_compute_subnetwork" "pe_west" {
 # Instances should not be accessible by the open internet so a fresh VPC should
 # be restricted to specific allowed subnets
 resource "google_compute_firewall" "pe_default" {
-  name    = "pe-default-${var.id}"
-  network = google_compute_network.pe.self_link
-  priority = 1000
+  name          = "pe-default-${var.id}"
+  network       = google_compute_network.pe.self_link
+  priority      = 1000
   source_ranges = var.allow
   allow { protocol = "icmp" }
   allow { protocol = "tcp" }

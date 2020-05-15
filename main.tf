@@ -15,7 +15,7 @@ provider "google" {
 data "google_compute_zones" "available" {
   count = var.destroy ? 0 : 1
   status = "UP"
- }
+}
 
 # Short name for addressing the list of zones for the region
 locals {
