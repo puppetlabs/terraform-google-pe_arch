@@ -35,9 +35,9 @@ resource "google_compute_instance" "master" {
   # immediately connect then fail
   provisioner "remote-exec" {
     connection {
-      host        = self.network_interface[0].access_config[0].nat_ip
-      type        = "ssh"
-      user        = var.user
+      host = self.network_interface[0].access_config[0].nat_ip
+      type = "ssh"
+      user = var.user
     }
     inline = ["# Connected"]
   }
@@ -78,9 +78,9 @@ resource "google_compute_instance" "psql" {
 
   provisioner "remote-exec" {
     connection {
-      host        = self.network_interface[0].access_config[0].nat_ip
-      type        = "ssh"
-      user        = var.user
+      host = self.network_interface[0].access_config[0].nat_ip
+      type = "ssh"
+      user = var.user
     }
     inline = ["# Connected"]
   }
@@ -99,6 +99,44 @@ resource "google_compute_instance" "compiler" {
     "sshKeys"      = "${var.user}:${file(var.ssh_key)}"
     "VmDnsSetting" = "ZonalPreferred"
     "internalDNS"  = "pe-compiler-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
+  }
+
+  boot_disk {
+    initialize_params {
+      image = var.instance_image
+      size  = 25
+      type  = "pd-ssd"
+    }
+  }
+
+  network_interface {
+    network    = var.network
+    subnetwork = var.subnetwork
+    access_config { }
+  }
+
+  provisioner "remote-exec" {
+    connection {
+      host = self.network_interface[0].access_config[0].nat_ip
+      type = "ssh"
+      user = var.user
+    }
+    inline = ["# Connected"]
+  }
+}
+
+resource "google_compute_instance" "node" {
+  name         = "pe-node-${var.id}-${count.index}"
+  machine_type = "n1-standard-1"
+  # count is used to effectively "no-op" this resource in the event that we
+  # deploy the standard architecture
+  count        = var.node_count
+  zone         = element(var.zones, count.index)
+
+  metadata = {
+    "sshKeys"      = "${var.user}:${file(var.ssh_key)}"
+    "VmDnsSetting" = "ZonalPreferred"
+    "internalDNS"  = "pe-node-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
   }
 
   boot_disk {

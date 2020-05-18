@@ -59,6 +59,7 @@ module "instances" {
   user           = var.user
   ssh_key        = var.ssh_key
   compiler_count = var.compiler_count
+  node_count     = var.node_count
   instance_image = var.instance_image
   project        = var.project
   architecture   = var.architecture
