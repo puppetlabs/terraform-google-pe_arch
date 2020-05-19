@@ -2,7 +2,6 @@
 # release of Terraform 0.12
 terraform {
   required_version = ">= 0.12.20"
-  experiments      = [variable_validation]
 }
 
 provider "google" {
@@ -44,7 +43,6 @@ module "loadbalancer" {
   network        = module.networking.network_link
   subnetwork     = module.networking.subnetwork_link
   region         = var.region
-  zones          = local.zones
   instances      = module.instances.compilers
   architecture   = var.architecture
 }

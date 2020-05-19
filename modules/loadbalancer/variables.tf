@@ -19,10 +19,6 @@ variable "id" {
   description = "Randomly generated value used to produce unique names for everything to prevent collisions and visually link resources together"
   type        = string
 }
-variable "zones" {
-  description = "GCP zone that are within the defined GCP region that you wish to use"
-  type        = list(string)
-}
 variable "architecture" {
   description = "Which of the supported PE architectures modules to deploy xlarge, large, or standard"
   type        = string
