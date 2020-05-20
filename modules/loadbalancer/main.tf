@@ -1,6 +1,11 @@
+# Zones list derived from where instances were previously deployed
+locals {
+  instance_zones = toset(var.instances[*].zone)
+}
+
 # Create an instance group per zone to attach that zone's compilers to
 resource "google_compute_instance_group" "backend" {
-  for_each  = var.architecture == "standard" ? [] : toset(var.zones)
+  for_each  = var.architecture == "standard" ? [] : local.instance_zones
   name      = "pe-compiler-${var.id}"
   instances = [for i in var.instances : i.self_link if i.zone == each.value]
   zone      = each.value
@@ -23,7 +28,7 @@ resource "google_compute_region_backend_service" "pe_compiler_lb" {
   region        = var.region
 
   dynamic "backend" {
-    for_each = toset(var.zones)
+    for_each = local.instance_zones
 
     content { group = google_compute_instance_group.backend[backend.value].self_link }
   }
