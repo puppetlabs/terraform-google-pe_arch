@@ -9,7 +9,7 @@ resource "google_compute_instance" "master" {
   # metadata so it is a property of the instance, making it easy to use later in
   # Bolt
   metadata = {
-    "sshKeys"      = "${var.user}:${file(var.ssh_key)}"
+    "ssh-keys"     = "${var.user}:${file(var.ssh_key)}"
     "VmDnsSetting" = "ZonalPreferred"
     "internalDNS"  = "pe-master-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
   }
@@ -27,7 +27,7 @@ resource "google_compute_instance" "master" {
   network_interface {
     network    = var.network
     subnetwork = var.subnetwork
-    access_config { }
+    access_config {}
   }
 
   # Using remote-execs on each instance deployment to ensure things are really
@@ -53,11 +53,11 @@ resource "google_compute_instance" "psql" {
   machine_type = "e2-standard-8"
   # count is used to effectively "no-op" this resource in the event that we
   # deploy any architecture other than xlarge
-  count        = var.architecture == "xlarge" ? 2 : 0
-  zone         = element(var.zones, count.index)
+  count = var.architecture == "xlarge" ? 2 : 0
+  zone  = element(var.zones, count.index)
 
   metadata = {
-    "sshKeys"      = "${var.user}:${file(var.ssh_key)}"
+    "ssh-keys"     = "${var.user}:${file(var.ssh_key)}"
     "VmDnsSetting" = "ZonalPreferred"
     "internalDNS"  = "pe-psql-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
   }
@@ -73,7 +73,7 @@ resource "google_compute_instance" "psql" {
   network_interface {
     network    = var.network
     subnetwork = var.subnetwork
-    access_config { }
+    access_config {}
   }
 
   provisioner "remote-exec" {
@@ -92,11 +92,11 @@ resource "google_compute_instance" "compiler" {
   machine_type = "e2-standard-2"
   # count is used to effectively "no-op" this resource in the event that we
   # deploy the standard architecture
-  count        = var.architecture == "standard" ? 0 : var.compiler_count
-  zone         = element(var.zones, count.index)
+  count = var.architecture == "standard" ? 0 : var.compiler_count
+  zone  = element(var.zones, count.index)
 
   metadata = {
-    "sshKeys"      = "${var.user}:${file(var.ssh_key)}"
+    "ssh-keys"     = "${var.user}:${file(var.ssh_key)}"
     "VmDnsSetting" = "ZonalPreferred"
     "internalDNS"  = "pe-compiler-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
   }
@@ -112,7 +112,7 @@ resource "google_compute_instance" "compiler" {
   network_interface {
     network    = var.network
     subnetwork = var.subnetwork
-    access_config { }
+    access_config {}
   }
 
   provisioner "remote-exec" {
@@ -130,11 +130,11 @@ resource "google_compute_instance" "node" {
   machine_type = "n1-standard-1"
   # count is used to effectively "no-op" this resource in the event that we
   # deploy the standard architecture
-  count        = var.node_count
-  zone         = element(var.zones, count.index)
+  count = var.node_count
+  zone  = element(var.zones, count.index)
 
   metadata = {
-    "sshKeys"      = "${var.user}:${file(var.ssh_key)}"
+    "ssh-keys"     = "${var.user}:${file(var.ssh_key)}"
     "VmDnsSetting" = "ZonalPreferred"
     "internalDNS"  = "pe-node-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
   }
@@ -150,14 +150,14 @@ resource "google_compute_instance" "node" {
   network_interface {
     network    = var.network
     subnetwork = var.subnetwork
-    access_config { }
+    access_config {}
   }
 
   provisioner "remote-exec" {
     connection {
-      host        = self.network_interface[0].access_config[0].nat_ip
-      type        = "ssh"
-      user        = var.user
+      host = self.network_interface[0].access_config[0].nat_ip
+      type = "ssh"
+      user = var.user
     }
     inline = ["# Connected"]
   }
