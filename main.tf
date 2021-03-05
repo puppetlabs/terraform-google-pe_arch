@@ -1,25 +1,53 @@
-# The module makes repeated use of the try() function so requires a very recent
-# release of Terraform 0.12
+# Terraform setup stuff, required providers, where they are sourced from, and
+# the provider's configuration requirements.
 terraform {
-  required_version = ">= 0.12.20"
+  required_providers {
+    hiera5 = {
+      source  = "sbitio/hiera5"
+      version = "0.2.7"
+    }
+    google = {
+      source  = "hashicorp/google"
+      version = "3.58.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "3.1.0"
+    }
+  }
 }
 
+# Sets the variables that'll be interpolated to determine where variables are
+# located in the hierarchy
+provider "hiera5" {
+  scope = {
+    architecture = var.architecture
+    replica      = var.replica
+  }
+}
+
+# GCP region and project to operating within
 provider "google" {
   project = var.project
   region  = var.region
 }
 
-# Retrieve list of zones to deploy to to prevent needing to know what they are
-# for each region
-data "google_compute_zones" "available" {
-  count = var.destroy ? 0 : 1
-  status = "UP"
+# hiera lookps
+data "hiera5" "server_count" {
+  key = "server_count"
+}
+data "hiera5" "database_count" {
+  key = "database_count"
+}
+data "hiera5_bool" "has_compilers" {
+  key = "has_compilers"
 }
 
-# Short name for addressing the list of zones for the region
-locals {
-  zones   = try(data.google_compute_zones.available[0].names, ["a","b","c"])
-  allowed = concat(["10.128.0.0/9"], var.firewall_allow)
+# Retrieve list of zones to deploy to prevent needing to know what they are for
+# each region. Use count to trigger a no-op when Bolt runs a destroy plan.
+data "google_compute_zones" "available" {
+  count  = var.destroy ? 0 : 1
+  status = "UP"
 }
 
 # It is intended that multiple deployments can be launched easily without
@@ -28,37 +56,50 @@ resource "random_id" "deployment" {
   byte_length = 3
 }
 
+# Collect some repeated values used by each major component module into one to
+# make them easier to update
+locals {
+  zones          = try(data.google_compute_zones.available[0].names, ["a", "b", "c"])
+  allowed        = concat(["10.128.0.0/9"], var.firewall_allow)
+  compiler_count = data.hiera5_bool.has_compilers.value ? var.compiler_count : 0
+  id             = random_id.deployment.hex
+  network        = module.networking.network_link
+  subnetwork     = module.networking.subnetwork_link
+  has_lb         = data.hiera5_bool.has_compilers.value ? true : false
+}
+
 # Contain all the networking configuration in a module for readability
 module "networking" {
   source = "./modules/networking"
-  id     = random_id.deployment.hex
+  id     = local.id
   allow  = local.allowed
 }
 
 # Contain all the loadbalancer configuration in a module for readability
 module "loadbalancer" {
-  source         = "./modules/loadbalancer"
-  id             = random_id.deployment.hex
-  ports          = ["8140", "8142"]
-  network        = module.networking.network_link
-  subnetwork     = module.networking.subnetwork_link
-  region         = var.region
-  instances      = module.instances.compilers
-  architecture   = var.architecture
+  source       = "./modules/loadbalancer"
+  id           = local.id
+  ports        = ["8140", "8142"]
+  network      = local.network
+  subnetwork   = local.subnetwork
+  region       = var.region
+  instances    = module.instances.compilers
+  has_lb       = local.has_lb
 }
 
 # Contain all the instances configuration in a module for readability
 module "instances" {
   source         = "./modules/instances"
-  id             = random_id.deployment.hex
-  network        = module.networking.network_link
-  subnetwork     = module.networking.subnetwork_link
+  id             = local.id
+  network        = local.network
+  subnetwork     = local.subnetwork
   zones          = local.zones
   user           = var.user
   ssh_key        = var.ssh_key
-  compiler_count = var.compiler_count
+  compiler_count = local.compiler_count
   node_count     = var.node_count
   instance_image = var.instance_image
   project        = var.project
-  architecture   = var.architecture
+  server_count   = data.hiera5.server_count.value
+  database_count = data.hiera5.database_count.value
 }

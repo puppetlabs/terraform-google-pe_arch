@@ -1,8 +1,8 @@
-# PE MoM instances in xlarge and large or the only instance in standard
-resource "google_compute_instance" "master" {
-  name         = "pe-master-${var.id}-${count.index}"
+# PE server instance(s) depending on if a replica is provisioned or not
+resource "google_compute_instance" "server" {
+  name         = "pe-server-${var.id}-${count.index}"
   machine_type = "e2-standard-4"
-  count        = var.architecture == "xlarge" ? 2 : 1
+  count        = var.server_count
   zone         = element(var.zones, count.index)
 
   # Constructing an FQDN from GCP convention for Zonal DNS and storing it as
@@ -11,7 +11,7 @@ resource "google_compute_instance" "master" {
   metadata = {
     "ssh-keys"     = "${var.user}:${file(var.ssh_key)}"
     "VmDnsSetting" = "ZonalPreferred"
-    "internalDNS"  = "pe-master-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
+    "internalDNS"  = "pe-server-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
   }
 
   boot_disk {
@@ -53,7 +53,7 @@ resource "google_compute_instance" "psql" {
   machine_type = "e2-standard-8"
   # count is used to effectively "no-op" this resource in the event that we
   # deploy any architecture other than xlarge
-  count = var.architecture == "xlarge" ? 2 : 0
+  count = var.database_count
   zone  = element(var.zones, count.index)
 
   metadata = {
@@ -92,7 +92,7 @@ resource "google_compute_instance" "compiler" {
   machine_type = "e2-standard-2"
   # count is used to effectively "no-op" this resource in the event that we
   # deploy the standard architecture
-  count = var.architecture == "standard" ? 0 : var.compiler_count
+  count = var.compiler_count
   zone  = element(var.zones, count.index)
 
   metadata = {
