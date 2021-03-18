@@ -15,7 +15,7 @@ IaC definitions for three of the supported Puppet Enterprise architectures for G
 
 ## Description
 
-This Terraform module implements as code the infrastructure required to deploy three permutations of the [supported](https://puppet.com/docs/pe/latest/choosing_an_architecture.html) Puppet Enterprise architectures: Standard, Large, and Extra Large with a failover replica on Google Cloud Platform. While this module can function independently, it is primarily developed as a component of [puppetlabs/autope](https://github.com/puppetlabs/puppetlabs-autope) to facilitate the end-to-end deployment of fully functional stacks of Puppet Enterprise for evaluation or with additional guidance, production. It sets up native GCP networks and load balancers specifically for containing and managing access to the deployment but avoids a dependence on cloud provided SQL services since Puppet Enterprise has its own facilities for managing and automating PostgreSQL.
+This Terraform module implements as code the infrastructure required to deploy three permutations of the [supported](https://puppet.com/docs/pe/latest/choosing_an_architecture.html) Puppet Enterprise architectures: Standard, Large, and Extra Large, addtionally all architectures can have additional infrastructure provisioned to support a failover replica on Google Cloud Platform. This module is developed to function independently but it is often used in support of [puppetlabs/peadm](https://github.com/puppetlabs/puppetlabs-peadm), brought together by [puppetlabs/autope](https://github.com/puppetlabs/puppetlabs-autope) to facilitate the end-to-end deployment of fully functional stacks of Puppet Enterprise. It sets up native GCP networks and load balancers specifically for containing and managing access to the deployment but avoids a dependence on cloud provided SQL services since Puppet Enterprise has its own facilities for managing and automating PostgreSQL.
 
 ## Setup
 
@@ -39,17 +39,17 @@ Types of things you'll be paying your cloud provider for
 1. Clone this repository
     * `git clone https://github.com/puppetlabs/terraform-google-pe_arch.git && cd terraform-google-pe_arch`
 2. Install module dependencies: `terraform init`
-3. Initiate plan for the default Extra Large with replica
+3. Initiate plan for the default standard architecture
     * `terraform apply -auto-approve -var "project=example.com" -var "user=john.doe" -var "firewall_allow=[ \"0.0.0.0/0\" ]"`
-4. Approximately 2 minutes later you'll have 7 VMs live and wired into an appropriate load balancer
+4. Moments later you'll be presented with a single VM where to install Puppet Enterprise
 
 ## Usage
 
-### Example: deploy standard architecture with a more restrictive network
+### Example: deploy large architecture with replica and a more restrictive network
 
 This will give you the absolute minimum needed for installing Puppet Enterprise, a single VM plus a specific network for it to reside within and limited to a specific network that have access to the new infrastructure (note: internal network will always be injected into the list)
 
-`terraform apply -auto-approve -var "project=example.com" -var "user=john.doe" -var "firewall_allow=[ \"192.69.65.0/24\" ]" -var architecture=standard`
+`terraform apply -auto-approve -var "project=example.com" -var "user=john.doe" -var "firewall_allow=[ \"192.69.65.0/24\" ]" -var "architecture=large" -var "replica=true"`
 
 ### Example: destroy stack
 

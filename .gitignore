@@ -26,4 +26,5 @@
 .project
 .envrc
 .terraform
+.terraform*
 terraform*

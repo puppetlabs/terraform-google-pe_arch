@@ -19,9 +19,9 @@ variable "id" {
   description = "Randomly generated value used to produce unique names for everything to prevent collisions and visually link resources together"
   type        = string
 }
-variable "architecture" {
-  description = "Which of the supported PE architectures modules to deploy xlarge, large, or standard"
-  type        = string
+variable "has_lb" {
+  description = "A boolean that indicates if the deployment requires load balancer deployment"
+  type        = bool
 }
 variable network    {
   description = "VPC network provisioned by the networking submodule"

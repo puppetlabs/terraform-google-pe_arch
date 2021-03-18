@@ -23,16 +23,20 @@ variable "node_count" {
   description = "The quantity of nodes that are deployed within the environment for testing"
   type        = number
 }
+variable "server_count" {
+  description = "The quantity of nodes that are deployed within the environment for testing"
+  type        = number
+}
+variable "database_count" {
+  description = "The quantity of nodes that are deployed within the environment for testing"
+  type        = number
+}
 variable "instance_image" {
   description = "The disk image to use when deploying new cloud instances"
   type        = string
 }
 variable "project" {
   description = "Name of GCP project that will be used for housing require infrastructure"
-  type        = string
-}
-variable "architecture" {
-  description = "Which of the supported PE architectures modules to deploy xlarge, large, or standard"
   type        = string
 }
 variable network    {
