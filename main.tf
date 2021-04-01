@@ -60,7 +60,7 @@ resource "random_id" "deployment" {
 # make them easier to update
 locals {
   zones          = try(data.google_compute_zones.available[0].names, ["a", "b", "c"])
-  allowed        = concat(["10.128.0.0/9"], var.firewall_allow)
+  allowed        = concat(["10.128.0.0/9", "35.191.0.0/16", "130.211.0.0/22"], var.firewall_allow)
   compiler_count = data.hiera5_bool.has_compilers.value ? var.compiler_count : 0
   id             = random_id.deployment.hex
   network        = module.networking.network_link
