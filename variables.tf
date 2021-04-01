@@ -29,7 +29,7 @@ variable "node_count" {
 variable "instance_image" {
   description = "The disk image to use when deploying new cloud instances"
   type        = string
-  default     = "centos-cloud/centos-7"
+  default     = "centos-cloud/centos-8"
 }
 variable "firewall_allow" {
   description = "List of permitted IP subnets, list most include the internal network and single addresses must be passed as a /32"
