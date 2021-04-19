@@ -14,6 +14,10 @@ resource "google_compute_instance" "server" {
     "internalDNS"  = "pe-server-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
   }
 
+  labels = {
+    "stack" = var.stack_name
+  }
+
   boot_disk {
     initialize_params {
       image = var.instance_image
@@ -62,6 +66,10 @@ resource "google_compute_instance" "psql" {
     "internalDNS"  = "pe-psql-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
   }
 
+  labels = {
+    "stack" = var.stack_name
+  }
+
   boot_disk {
     initialize_params {
       image = var.instance_image
@@ -101,6 +109,10 @@ resource "google_compute_instance" "compiler" {
     "internalDNS"  = "pe-compiler-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
   }
 
+  labels = {
+    "stack" = var.stack_name
+  }
+
   boot_disk {
     initialize_params {
       image = var.instance_image
@@ -137,6 +149,10 @@ resource "google_compute_instance" "node" {
     "ssh-keys"     = "${var.user}:${file(var.ssh_key)}"
     "VmDnsSetting" = "ZonalPreferred"
     "internalDNS"  = "pe-node-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
+  }
+
+  labels = {
+    "stack" = var.stack_name
   }
 
   boot_disk {
