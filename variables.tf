@@ -31,6 +31,11 @@ variable "instance_image" {
   type        = string
   default     = "centos-cloud/centos-8"
 }
+variable "stack_name" {
+  description = "A name that'll help the user identify which instances are are part of a specific PE deployment"
+  type        = string
+  default     = "puppet-enterprise"
+}
 variable "firewall_allow" {
   description = "List of permitted IP subnets, list most include the internal network and single addresses must be passed as a /32"
   type        = list(string)
