@@ -1,6 +1,6 @@
 # Zones list derived from where instances were previously deployed
 locals {
-  instance_zones = toset(var.instances[*].zone)
+  instance_zones = toset(nonsensitive(var.instances[*].zone))
   lb_count = var.has_lb ? 1 : 0
 }
 
