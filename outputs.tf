@@ -7,4 +7,5 @@ output "console" {
 output "pool" {
   value       = module.loadbalancer.lb_dns_name
   description = "The GCP internal network FQDN of the Puppet Enterprise compiler pool"
+  sensitive   = true
 }
