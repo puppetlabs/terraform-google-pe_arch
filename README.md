@@ -72,6 +72,15 @@ The number of options required are reduced when destroying a stack
 
 `terraform destroy -auto-approve -var "project=example.com" -var "user=john.doe"`
 
+## Usage notes
+
+1. For making ssh access work with Terraform's google provider, you will need to add your private key corresponding to the public key in the `ssh_key` parameter to the ssh agent like so:
+
+```bash
+> eval `ssh-agent`
+> ssh-add <private_key_path>
+```
+
 ## Limitations
 
 Currently limited to CentOS and VM disk sizes are not configurable
