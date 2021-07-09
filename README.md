@@ -47,7 +47,7 @@ Types of things you'll be paying your cloud provider for
 * [GCP Cloud SDK Intalled](https://cloud.google.com/sdk/docs/quickstarts)
 * [GCP Application Default Credentials](https://cloud.google.com/sdk/gcloud/reference/auth/application-default/)
 * [Git Installed](https://git-scm.com/downloads)
-* [Terraform (>= 0.12.20) Installed](https://www.terraform.io/downloads.html)
+* [Terraform (>= 0.13.0, <= 1.0.2) Installed](https://www.terraform.io/downloads.html)
 
 ### Beginning with google-pe_arch
 
