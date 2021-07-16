@@ -33,18 +33,6 @@ resource "google_compute_instance" "server" {
     subnetwork = var.subnetwork
     access_config {}
   }
-
-  # Using remote-execs on each instance deployment to ensure things are really
-  # really up before doing to the next step, helps with Bolt plans that'll
-  # immediately connect then fail
-  provisioner "remote-exec" {
-    connection {
-      host = self.network_interface[0].access_config[0].nat_ip
-      type = "ssh"
-      user = var.user
-    }
-    inline = ["# Connected"]
-  }
 }
 
 # Reasons given for what is happening in each reason block are they same as
@@ -83,15 +71,6 @@ resource "google_compute_instance" "psql" {
     subnetwork = var.subnetwork
     access_config {}
   }
-
-  provisioner "remote-exec" {
-    connection {
-      host = self.network_interface[0].access_config[0].nat_ip
-      type = "ssh"
-      user = var.user
-    }
-    inline = ["# Connected"]
-  }
 }
 
 # Instances to run as compilers
@@ -126,15 +105,6 @@ resource "google_compute_instance" "compiler" {
     subnetwork = var.subnetwork
     access_config {}
   }
-
-  provisioner "remote-exec" {
-    connection {
-      host = self.network_interface[0].access_config[0].nat_ip
-      type = "ssh"
-      user = var.user
-    }
-    inline = ["# Connected"]
-  }
 }
 
 resource "google_compute_instance" "node" {
@@ -167,14 +137,5 @@ resource "google_compute_instance" "node" {
     network    = var.network
     subnetwork = var.subnetwork
     access_config {}
-  }
-
-  provisioner "remote-exec" {
-    connection {
-      host = self.network_interface[0].access_config[0].nat_ip
-      type = "ssh"
-      user = var.user
-    }
-    inline = ["# Connected"]
   }
 }
