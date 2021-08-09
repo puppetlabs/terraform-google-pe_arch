@@ -10,3 +10,8 @@ variable "allow" {
   description = "List of permitted IP subnets"
   type        = list(string)
 }
+variable "to_create" {
+  description = "If the networks should be created"
+  type        = bool
+  default     = true
+}
