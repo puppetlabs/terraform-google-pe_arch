@@ -35,9 +35,9 @@ variable "instance_image" {
   description = "The disk image to use when deploying new cloud instances"
   type        = string
 }
-variable "stack_name" {
-  description = "A name that'll help the user identify which instances are are part of a specific PE deployment"
-  type        = string
+variable "labels" {
+  description = "A map of labels to apply to the instances"
+  type        = map
 }
 variable "project" {
   description = "Name of GCP project that will be used for housing require infrastructure"

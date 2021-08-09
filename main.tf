@@ -66,6 +66,7 @@ locals {
   network        = module.networking.network_link
   subnetwork     = module.networking.subnetwork_link
   has_lb         = data.hiera5_bool.has_compilers.value ? true : false
+  labels         = merge(var.labels, { "stack" = var.stack_name })
 }
 
 # Contain all the networking configuration in a module for readability
@@ -99,7 +100,7 @@ module "instances" {
   compiler_count = local.compiler_count
   node_count     = var.node_count
   instance_image = var.instance_image
-  stack_name     = var.stack_name
+  labels         = local.labels
   project        = var.project
   server_count   = data.hiera5.server_count.value
   database_count = data.hiera5.database_count.value

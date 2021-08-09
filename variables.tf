@@ -2,7 +2,7 @@ variable "project" {
   description = "Name of GCP project that will be used for housing require infrastructure"
   type        = string
 }
-variable "user" { 
+variable "user" {
   description = "Instance user name that will used for SSH operations"
   type        = string
 }
@@ -60,4 +60,9 @@ variable "destroy" {
   description = "Available to facilitate simplified destroy via Puppet Bolt, irrelevant outside specific use case"
   type        = bool
   default     = false
+}
+variable "labels" {
+  description = "A map of labels that will be applied to the instances"
+  type        = map
+  default     = {}
 }
