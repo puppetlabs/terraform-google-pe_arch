@@ -1,7 +1,7 @@
 # PE server instance(s) depending on if a replica is provisioned or not
 resource "google_compute_instance" "server" {
   name         = "pe-server-${var.id}-${count.index}"
-  machine_type = "e2-standard-4"
+  machine_type = var.primary_type
   count        = var.server_count
   zone         = element(var.zones, count.index)
 
@@ -19,7 +19,7 @@ resource "google_compute_instance" "server" {
   boot_disk {
     initialize_params {
       image = var.instance_image
-      size  = 50
+      size  = var.primary_disk
       type  = "pd-ssd"
     }
   }
@@ -40,7 +40,7 @@ resource "google_compute_instance" "server" {
 # Instances to run PE PSQL
 resource "google_compute_instance" "psql" {
   name         = "pe-psql-${var.id}-${count.index}"
-  machine_type = "e2-standard-8"
+  machine_type = var.database_type
   # count is used to effectively "no-op" this resource in the event that we
   # deploy any architecture other than xlarge
   count = var.database_count
@@ -57,7 +57,7 @@ resource "google_compute_instance" "psql" {
   boot_disk {
     initialize_params {
       image = var.instance_image
-      size  = 100
+      size  = var.database_disk
       type  = "pd-ssd"
     }
   }
@@ -72,7 +72,7 @@ resource "google_compute_instance" "psql" {
 # Instances to run as compilers
 resource "google_compute_instance" "compiler" {
   name         = "pe-compiler-${var.id}-${count.index}"
-  machine_type = "e2-standard-2"
+  machine_type = var.compiler_type
   # count is used to effectively "no-op" this resource in the event that we
   # deploy the standard architecture
   count = var.compiler_count
@@ -89,7 +89,7 @@ resource "google_compute_instance" "compiler" {
   boot_disk {
     initialize_params {
       image = var.instance_image
-      size  = 25
+      size  = var.compiler_disk
       type  = "pd-ssd"
     }
   }

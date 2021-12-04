@@ -61,7 +61,16 @@ variable "destroy" {
   type        = bool
   default     = false
 }
-variable "labels" {
+variable "mode" {
+  description = "Which mode to run the plan in, production or development to determine default instance types"
+  type        = string
+  default     = "development"
+
+  validation {
+    condition     = contains(["production", "development", "user"], var.mode)
+    error_message = "Mode selection must match one of production, development, or user which will enable you to define custom instance profiles."
+  }
+}variable "labels" {
   description = "A map of labels that will be applied to the instances"
   type        = map
   default     = {}
