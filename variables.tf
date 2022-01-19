@@ -68,7 +68,7 @@ variable "cluster_profile" {
 
   validation {
     condition     = contains(["production", "development", "user"], var.cluster_profile)
-    error_message = "cluster_profile selection must match one of production, development, or user."
+    error_message = "The cluster profile selection must match one of production, development, or user."
   }
 }variable "labels" {
   description = "A map of labels that will be applied to the instances"
