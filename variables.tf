@@ -61,14 +61,14 @@ variable "destroy" {
   type        = bool
   default     = false
 }
-variable "mode" {
-  description = "Which mode to run the plan in, production or development to determine default instance types"
+variable "cluster_profile" {
+  description = "Which cluster profile to use for defining provisioned instance sizes"
   type        = string
   default     = "development"
 
   validation {
-    condition     = contains(["production", "development", "user"], var.mode)
-    error_message = "Mode selection must match one of production, development, or user which will enable you to define custom instance profiles."
+    condition     = contains(["production", "development", "user"], var.cluster_profile)
+    error_message = "cluster_profile selection must match one of production, development, or user."
   }
 }variable "labels" {
   description = "A map of labels that will be applied to the instances"
