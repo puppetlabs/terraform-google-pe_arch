@@ -1,5 +1,5 @@
 ---
-compiler_instance_type: custom-6-12288
-primary_instance_type: custom-16-32768
+compiler_instance_type: n2-custom-6-12288
+primary_instance_type: n2-custom-16-32768
 compiler_disk_size: 60
 primary_disk_size: 185
