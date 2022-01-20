@@ -2,3 +2,6 @@
 server_count: 1
 database_count: 1
 has_compilers: true
+compiler_instance_type: e2-standard-2
+primary_instance_type: e2-standard-4
+database_instance_type: e2-standard-8

@@ -61,6 +61,16 @@ variable "destroy" {
   type        = bool
   default     = false
 }
+variable "cluster_profile" {
+  description = "Which cluster profile to use for defining provisioned instance sizes"
+  type        = string
+  default     = "development"
+
+  validation {
+    condition     = contains(["production", "development", "user"], var.cluster_profile)
+    error_message = "The cluster profile selection must match one of production, development, or user."
+  }
+}
 variable "labels" {
   description = "A map of labels that will be applied to the instances"
   type        = map
