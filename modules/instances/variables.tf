@@ -51,6 +51,10 @@ variable subnetwork {
   description = "Regional subnetwork assigned to VPC network provisioned by the networking submodule"
   type        = string
 }
+variable subnetwork_project {
+  description = "Regional subnetwork project assigned to VPC network provisioned by the networking submodule"
+  type        = string
+}
 variable "id" {
   description = "Randomly generated value used to produce unique names for everything to prevent collisions and visually link resources together"
   type        = string

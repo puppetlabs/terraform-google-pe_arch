@@ -26,10 +26,15 @@ resource "google_compute_instance" "server" {
 
   # Configuration of instances requires external IP address but it doesn't
   # matter what they are so dynamic sourcing them from global pool is ok
+  # If a subnetwork_project is specified, an external IP is not needed.
   network_interface {
-    network    = var.network
-    subnetwork = var.subnetwork
-    access_config {}
+    network            = var.network
+    subnetwork         = var.subnetwork
+    subnetwork_project = var.subnetwork_project
+    dynamic "access_config" {
+      for_each = var.subnetwork_project == null ? [1] : []
+      content {}
+    }
   }
 }
 
@@ -62,10 +67,15 @@ resource "google_compute_instance" "psql" {
     }
   }
 
+  # If a subnetwork_project is specified, an external IP is not needed.
   network_interface {
-    network    = var.network
-    subnetwork = var.subnetwork
-    access_config {}
+    network            = var.network
+    subnetwork         = var.subnetwork
+    subnetwork_project = var.subnetwork_project
+    dynamic "access_config" {
+      for_each = var.subnetwork_project == null ? [1] : []
+      content {}
+    }
   }
 }
 
@@ -94,10 +104,15 @@ resource "google_compute_instance" "compiler" {
     }
   }
 
+  # If a subnetwork_project is specified, an external IP is not needed.
   network_interface {
-    network    = var.network
-    subnetwork = var.subnetwork
-    access_config {}
+    network            = var.network
+    subnetwork         = var.subnetwork
+    subnetwork_project = var.subnetwork_project
+    dynamic "access_config" {
+      for_each = var.subnetwork_project == null ? [1] : []
+      content {}
+    }
   }
 }
 
@@ -125,9 +140,14 @@ resource "google_compute_instance" "node" {
     }
   }
 
+  # If a subnetwork_project is specified, an external IP is not needed.
   network_interface {
-    network    = var.network
-    subnetwork = var.subnetwork
-    access_config {}
+    network            = var.network
+    subnetwork         = var.subnetwork
+    subnetwork_project = var.subnetwork_project
+    dynamic "access_config" {
+      for_each = var.subnetwork_project == null ? [1] : []
+      content {}
+    }
   }
 }

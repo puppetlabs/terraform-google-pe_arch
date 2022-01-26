@@ -85,17 +85,29 @@ locals {
   allowed        = concat(["10.128.0.0/9", "35.191.0.0/16", "130.211.0.0/22"], var.firewall_allow)
   compiler_count = data.hiera5_bool.has_compilers.value ? var.compiler_count : 0
   id             = random_id.deployment.hex
-  network        = module.networking.network_link
-  subnetwork     = module.networking.subnetwork_link
+  network        = coalesce(module.networking.network_link, try(data.google_compute_subnetwork.existing[0].network, null))
+  subnetwork     = coalesce(module.networking.subnetwork_link, try(data.google_compute_subnetwork.existing[0].self_link, null))
+  create_network = var.subnetwork_project == null ? true : false
+  fetch_existing = var.subnetwork_project == null ? 0 : 1 
   has_lb         = data.hiera5_bool.has_compilers.value ? true : false
   labels         = merge(var.labels, { "stack" = var.stack_name })
 }
 
+# If we didn't create a network then we need to know the network of our
+# pre-existing, likely a shared subnetwork to associate resource with
+data "google_compute_subnetwork" "existing" {
+  count   = local.fetch_existing
+  name    = var.subnetwork
+  region  = var.region
+  project = var.subnetwork_project
+}
+
 # Contain all the networking configuration in a module for readability
 module "networking" {
-  source = "./modules/networking"
-  id     = local.id
-  allow  = local.allowed
+  source    = "./modules/networking"
+  id        = local.id
+  allow     = local.allowed
+  to_create = local.create_network
 }
 
 # Contain all the loadbalancer configuration in a module for readability
@@ -112,24 +124,25 @@ module "loadbalancer" {
 
 # Contain all the instances configuration in a module for readability
 module "instances" {
-  source         = "./modules/instances"
-  id             = local.id
-  network        = local.network
-  subnetwork     = local.subnetwork
-  zones          = local.zones
-  user           = var.user
-  ssh_key        = var.ssh_key
-  compiler_count = local.compiler_count
-  node_count     = var.node_count
-  instance_image = var.instance_image
-  labels         = local.labels
-  project        = var.project
-  server_count   = data.hiera5.server_count.value
-  database_count = data.hiera5.database_count.value
-  compiler_type  = data.hiera5.compiler_type.value
-  primary_type   = data.hiera5.primary_type.value
-  database_type  = data.hiera5.database_type.value
-  compiler_disk  = data.hiera5.compiler_disk.value
-  primary_disk   = data.hiera5.primary_disk.value
-  database_disk  = data.hiera5.database_disk.value
+  source             = "./modules/instances"
+  id                 = local.id
+  network            = local.network
+  subnetwork         = local.subnetwork
+  subnetwork_project = var.subnetwork_project
+  zones              = local.zones
+  user               = var.user
+  ssh_key            = var.ssh_key
+  compiler_count     = local.compiler_count
+  node_count         = var.node_count
+  instance_image     = var.instance_image
+  labels             = local.labels
+  project            = var.project
+  server_count       = data.hiera5.server_count.value
+  database_count     = data.hiera5.database_count.value
+  compiler_type      = data.hiera5.compiler_type.value
+  primary_type       = data.hiera5.primary_type.value
+  database_type      = data.hiera5.database_type.value
+  compiler_disk      = data.hiera5.compiler_disk.value
+  primary_disk       = data.hiera5.primary_disk.value
+  database_disk      = data.hiera5.database_disk.value
 }
