@@ -85,11 +85,21 @@ locals {
   allowed        = concat(["10.128.0.0/9", "35.191.0.0/16", "130.211.0.0/22"], var.firewall_allow)
   compiler_count = data.hiera5_bool.has_compilers.value ? var.compiler_count : 0
   id             = random_id.deployment.hex
-  network        = coalesce(var.network, module.networking.network_link)
-  subnetwork     = coalesce(var.subnetwork, module.networking.subnetwork_link)
+  network        = coalesce(module.networking.network_link, try(data.google_compute_subnetwork.existing[0].network, null))
+  subnetwork     = coalesce(module.networking.subnetwork_link, try(data.google_compute_subnetwork.existing[0].self_link, null))
   create_network = var.subnetwork_project == null ? true : false
+  fetch_existing = var.subnetwork_project == null ? 0 : 1 
   has_lb         = data.hiera5_bool.has_compilers.value ? true : false
   labels         = merge(var.labels, { "stack" = var.stack_name })
+}
+
+# If we didn't create a network then we need to know the network of our
+# pre-existing, likely a shared subnetwork to associate resource with
+data "google_compute_subnetwork" "existing" {
+  count   = local.fetch_existing
+  name    = var.subnetwork
+  region  = var.region
+  project = var.subnetwork_project
 }
 
 # Contain all the networking configuration in a module for readability
@@ -109,7 +119,7 @@ module "loadbalancer" {
   subnetwork   = local.subnetwork
   region       = var.region
   instances    = module.instances.compilers
-  has_lb       = local.has_lb && local.create_network
+  has_lb       = local.has_lb
 }
 
 # Contain all the instances configuration in a module for readability
