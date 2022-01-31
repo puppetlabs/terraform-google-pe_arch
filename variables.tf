@@ -29,7 +29,7 @@ variable "node_count" {
 variable "instance_image" {
   description = "The disk image to use when deploying new cloud instances"
   type        = string
-  default     = "centos-cloud/centos-8"
+  default     = "rocky-linux-cloud/rocky-linux-8"
 }
 variable "stack_name" {
   description = "A name that'll help the user identify which instances are are part of a specific PE deployment"
