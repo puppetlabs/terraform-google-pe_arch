@@ -87,8 +87,8 @@ locals {
   id             = random_id.deployment.hex
   network        = coalesce(module.networking.network_link, try(data.google_compute_subnetwork.existing[0].network, null))
   subnetwork     = coalesce(module.networking.subnetwork_link, try(data.google_compute_subnetwork.existing[0].self_link, null))
-  create_network = var.subnetwork_project == null ? true : false
-  fetch_existing = var.subnetwork_project == null ? 0 : 1 
+  create_network = var.subnetwork == null ? true : false
+  fetch_existing = var.subnetwork == null ? 0 : 1
   has_lb         = data.hiera5_bool.has_compilers.value ? true : false
   labels         = merge(var.labels, { "stack" = var.stack_name })
 }
