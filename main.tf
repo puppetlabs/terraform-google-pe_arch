@@ -89,7 +89,7 @@ locals {
   subnetwork     = coalesce(module.networking.subnetwork_link, try(data.google_compute_subnetwork.existing[0].self_link, null))
   create_network = var.subnetwork == null ? true : false
   fetch_existing = var.subnetwork == null ? 0 : 1
-  has_lb         = data.hiera5_bool.has_compilers.value ? true : false
+  has_lb         = var.disable_lb ? false : data.hiera5_bool.has_compilers.value ? true : false
   labels         = merge(var.labels, { "stack" = var.stack_name })
 }
 
@@ -112,14 +112,15 @@ module "networking" {
 
 # Contain all the loadbalancer configuration in a module for readability
 module "loadbalancer" {
-  source       = "./modules/loadbalancer"
-  id           = local.id
-  ports        = ["8140", "8142"]
-  network      = local.network
-  subnetwork   = local.subnetwork
-  region       = var.region
-  instances    = module.instances.compilers
-  has_lb       = local.has_lb
+  source     = "./modules/loadbalancer"
+  id         = local.id
+  ports      = ["8140", "8142"]
+  network    = local.network
+  subnetwork = local.subnetwork
+  region     = var.region
+  instances  = module.instances.compilers
+  has_lb     = local.has_lb
+  lb_ip_mode = var.lb_ip_mode
 }
 
 # Contain all the instances configuration in a module for readability

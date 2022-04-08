@@ -31,3 +31,7 @@ variable subnetwork {
   description = "Regional subnetwork assigned to VPC network provisioned by the networking submodule"
   type        = string
 }
+variable "lb_ip_mode" {
+  description = "Designate if a public or private IP address is assigned to load balancer"
+  type        = string
+}
