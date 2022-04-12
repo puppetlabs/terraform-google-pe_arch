@@ -76,13 +76,13 @@ variable "labels" {
   type        = map
   default     = {}
 }
-variable "subnetwork" {
-  description = "An optional subnetwork to use"
+variable "subnet" {
+  description = "An optional subnet to use"
   type        = string
   default     = null
 }
-variable "subnetwork_project" {
-  description = "An optional subnetwork_project to use"
+variable "subnet_project" {
+  description = "An optional subnet_project to use"
   type        = string
   default     = null
 }

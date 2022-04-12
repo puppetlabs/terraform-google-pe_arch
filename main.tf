@@ -86,9 +86,9 @@ locals {
   compiler_count = data.hiera5_bool.has_compilers.value ? var.compiler_count : 0
   id             = random_id.deployment.hex
   network        = coalesce(module.networking.network_link, try(data.google_compute_subnetwork.existing[0].network, null))
-  subnetwork     = coalesce(module.networking.subnetwork_link, try(data.google_compute_subnetwork.existing[0].self_link, null))
-  create_network = var.subnetwork == null ? true : false
-  fetch_existing = var.subnetwork == null ? 0 : 1
+  subnet         = coalesce(module.networking.subnetwork_link, try(data.google_compute_subnetwork.existing[0].self_link, null))
+  create_network = var.subnet == null ? true : false
+  fetch_existing = var.subnet == null ? 0 : 1
   has_lb         = var.disable_lb ? false : data.hiera5_bool.has_compilers.value ? true : false
   labels         = merge(var.labels, { "stack" = var.stack_name })
 }
@@ -97,9 +97,9 @@ locals {
 # pre-existing, likely a shared subnetwork to associate resource with
 data "google_compute_subnetwork" "existing" {
   count   = local.fetch_existing
-  name    = var.subnetwork
+  name    = var.subnet
   region  = var.region
-  project = var.subnetwork_project
+  project = var.subnet_project
 }
 
 # Contain all the networking configuration in a module for readability
@@ -116,7 +116,7 @@ module "loadbalancer" {
   id         = local.id
   ports      = ["8140", "8142"]
   network    = local.network
-  subnetwork = local.subnetwork
+  subnetwork = local.subnet
   region     = var.region
   instances  = module.instances.compilers
   has_lb     = local.has_lb
@@ -128,8 +128,8 @@ module "instances" {
   source             = "./modules/instances"
   id                 = local.id
   network            = local.network
-  subnetwork         = local.subnetwork
-  subnetwork_project = var.subnetwork_project
+  subnetwork         = local.subnet
+  subnetwork_project = var.subnet_project
   zones              = local.zones
   user               = var.user
   ssh_key            = var.ssh_key
