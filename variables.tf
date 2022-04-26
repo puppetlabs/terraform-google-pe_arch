@@ -76,18 +76,28 @@ variable "labels" {
   type        = map
   default     = {}
 }
-variable "network" {
-  description = "An optional network to use"
+variable "subnet" {
+  description = "An optional subnet to use"
   type        = string
   default     = null
 }
-variable "subnetwork" {
-  description = "An optional subnetwork to use"
+variable "subnet_project" {
+  description = "An optional subnet_project to use"
   type        = string
   default     = null
 }
-variable "subnetwork_project" {
-  description = "An optional subnetwork_project to use"
+variable "lb_ip_mode" {
+  description = "Designate if a public or private IP address is assigned to load balancer"
   type        = string
-  default     = null
+  default     = "public"
+
+  validation {
+    condition     = contains(["public", "private"], var.lb_ip_mode)
+    error_message = "The provisioned load balancer can only have a public or private IP address assigned."
+  }
+}
+variable "disable_lb" {
+  description = "Disable load balancer creation for all architectures if you desire manually provisioning your own"
+  type        = bool
+  default     = false
 }
