@@ -138,6 +138,7 @@ module "instances" {
   labels             = var.labels
   metadata           = var.metadata
   project            = var.project
+  domain_name        = var.domain_name
   server_count       = data.hiera5.server_count.value
   database_count     = data.hiera5.database_count.value
   compiler_type      = data.hiera5.compiler_type.value

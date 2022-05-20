@@ -16,7 +16,7 @@ resource "google_compute_instance" "server" {
   # metadata so it is a property of the instance, making it easy to use later in
   # Bolt
   metadata = merge({
-    "internalDNS"  = "pe-server-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
+    "internalDNS"  = var.domain_name == null ? "pe-server-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal" : "pe-server-${var.id}-${count.index}.${var.domain_name}"
   }, local.metadata)
 
   labels = var.labels
@@ -57,7 +57,7 @@ resource "google_compute_instance" "psql" {
   zone  = element(var.zones, count.index)
 
   metadata = merge({
-    "internalDNS"  = "pe-psql-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
+    "internalDNS"  = var.domain_name == null ? "pe-psql-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal" : "pe-psql-${var.id}-${count.index}.${var.domain_name}"
   }, local.metadata)
 
   labels = var.labels
@@ -92,7 +92,7 @@ resource "google_compute_instance" "compiler" {
   zone  = element(var.zones, count.index)
 
   metadata = merge({
-    "internalDNS"  = "pe-compiler-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
+    "internalDNS"  = var.domain_name == null ? "pe-compiler-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal" : "pe-compiler-${var.id}-${count.index}.${var.domain_name}"
   }, local.metadata)
 
   labels = var.labels
@@ -126,7 +126,7 @@ resource "google_compute_instance" "node" {
   zone  = element(var.zones, count.index)
 
   metadata = merge({
-    "internalDNS"  = "pe-compiler-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
+    "internalDNS"  = var.domain_name == null ? "pe-node-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal" : "pe-node-${var.id}-${count.index}.${var.domain_name}"
   }, local.metadata)
 
   labels = var.labels
