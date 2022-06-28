@@ -36,8 +36,14 @@ variable "instance_image" {
   type        = string
 }
 variable "labels" {
-  description = "A map of labels to apply to the instances"
+  description = "A list of labels that will be applied to virtual instances"
   type        = map
+  default     = {}
+}
+variable "metadata" {
+  description = "A map of user supplied metadata that will be applied to virtual instances"
+  type        = map
+  default     = {}
 }
 variable "project" {
   description = "Name of GCP project that will be used for housing require infrastructure"

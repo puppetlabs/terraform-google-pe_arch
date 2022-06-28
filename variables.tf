@@ -31,11 +31,6 @@ variable "instance_image" {
   type        = string
   default     = "almalinux-cloud/almalinux-8"
 }
-variable "stack_name" {
-  description = "A name that'll help the user identify which instances are are part of a specific PE deployment"
-  type        = string
-  default     = "puppet-enterprise"
-}
 variable "firewall_allow" {
   description = "List of permitted IP subnets, list most include the internal network and single addresses must be passed as a /32"
   type        = list(string)
@@ -72,7 +67,12 @@ variable "cluster_profile" {
   }
 }
 variable "labels" {
-  description = "A map of labels that will be applied to the instances"
+  description = "A list of labels that will be applied to virtual instances"
+  type        = map
+  default     = {}
+}
+variable "metadata" {
+  description = "A map of user supplied metadata that will be applied to virtual instances"
   type        = map
   default     = {}
 }
