@@ -90,7 +90,6 @@ locals {
   create_network = var.subnet == null ? true : false
   fetch_existing = var.subnet == null ? 0 : 1
   has_lb         = var.disable_lb ? false : data.hiera5_bool.has_compilers.value ? true : false
-  labels         = merge(var.labels, { "stack" = var.stack_name })
 }
 
 # If we didn't create a network then we need to know the network of our
@@ -136,7 +135,8 @@ module "instances" {
   compiler_count     = local.compiler_count
   node_count         = var.node_count
   instance_image     = var.instance_image
-  labels             = local.labels
+  labels             = var.labels
+  metadata           = var.metadata
   project            = var.project
   server_count       = data.hiera5.server_count.value
   database_count     = data.hiera5.database_count.value

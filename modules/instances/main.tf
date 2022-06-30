@@ -1,3 +1,10 @@
+locals {
+  metadata = merge({
+    "ssh-keys"     = "${var.user}:${file(var.ssh_key)}"
+    "VmDnsSetting" = "ZonalPreferred"
+  }, var.metadata)
+}
+
 # PE server instance(s) depending on if a replica is provisioned or not
 resource "google_compute_instance" "server" {
   name         = "pe-server-${var.id}-${count.index}"
@@ -8,11 +15,9 @@ resource "google_compute_instance" "server" {
   # Constructing an FQDN from GCP convention for Zonal DNS and storing it as
   # metadata so it is a property of the instance, making it easy to use later in
   # Bolt
-  metadata = {
-    "ssh-keys"     = "${var.user}:${file(var.ssh_key)}"
-    "VmDnsSetting" = "ZonalPreferred"
+  metadata = merge({
     "internalDNS"  = "pe-server-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
-  }
+  }, local.metadata)
 
   labels = var.labels
 
@@ -51,11 +56,9 @@ resource "google_compute_instance" "psql" {
   count = var.database_count
   zone  = element(var.zones, count.index)
 
-  metadata = {
-    "ssh-keys"     = "${var.user}:${file(var.ssh_key)}"
-    "VmDnsSetting" = "ZonalPreferred"
+  metadata = merge({
     "internalDNS"  = "pe-psql-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
-  }
+  }, local.metadata)
 
   labels = var.labels
 
@@ -88,11 +91,9 @@ resource "google_compute_instance" "compiler" {
   count = var.compiler_count
   zone  = element(var.zones, count.index)
 
-  metadata = {
-    "ssh-keys"     = "${var.user}:${file(var.ssh_key)}"
-    "VmDnsSetting" = "ZonalPreferred"
+  metadata = merge({
     "internalDNS"  = "pe-compiler-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
-  }
+  }, local.metadata)
 
   labels = var.labels
 
@@ -124,11 +125,9 @@ resource "google_compute_instance" "node" {
   count = var.node_count
   zone  = element(var.zones, count.index)
 
-  metadata = {
-    "ssh-keys"     = "${var.user}:${file(var.ssh_key)}"
-    "VmDnsSetting" = "ZonalPreferred"
-    "internalDNS"  = "pe-node-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
-  }
+  metadata = merge({
+    "internalDNS"  = "pe-compiler-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal"
+  }, local.metadata)
 
   labels = var.labels
 
