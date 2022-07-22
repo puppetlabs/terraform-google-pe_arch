@@ -1,0 +1,10 @@
+{
+  "archives": {
+    "darwin_arm64": {
+      "hashes": [
+        "h1:oKoQWzp/T3GFW+ZyjuGCTQ1j5CZ/HqZZ6jlLOnFb4Ww="
+      ],
+      "url": "terraform-provider-hiera5_0.2.7_darwin_arm64.zip"
+    }
+  }
+}
