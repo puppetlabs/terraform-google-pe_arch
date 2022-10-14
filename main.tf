@@ -3,8 +3,8 @@
 terraform {
   required_providers {
     hiera5 = {
-      source  = "sbitio/hiera5"
-      version = "0.2.7"
+      source  = "chriskuchin/hiera5"
+      version = "0.3.0"
     }
     google = {
       source  = "hashicorp/google"
