@@ -133,7 +133,6 @@ module "instances" {
   user               = var.user
   ssh_key            = var.ssh_key
   compiler_count     = local.compiler_count
-  node_count         = var.node_count
   instance_image     = var.instance_image
   labels             = var.labels
   metadata           = var.metadata

@@ -116,37 +116,3 @@ resource "google_compute_instance" "compiler" {
     }
   }
 }
-
-resource "google_compute_instance" "node" {
-  name         = "pe-node-${var.id}-${count.index}"
-  machine_type = "n1-standard-1"
-  # count is used to effectively "no-op" this resource in the event that we
-  # deploy the standard architecture
-  count = var.node_count
-  zone  = element(var.zones, count.index)
-
-  metadata = merge({
-    "internalDNS"  = var.domain_name == null ? "pe-node-${var.id}-${count.index}.${element(var.zones, count.index)}.c.${var.project}.internal" : "pe-node-${var.id}-${count.index}.${var.domain_name}"
-  }, local.metadata)
-
-  labels = var.labels
-
-  boot_disk {
-    initialize_params {
-      image = var.instance_image
-      size  = 25
-      type  = "pd-ssd"
-    }
-  }
-
-  # If a subnetwork_project is specified, an external IP is not needed.
-  network_interface {
-    network            = var.network
-    subnetwork         = var.subnetwork
-    subnetwork_project = var.subnetwork_project
-    dynamic "access_config" {
-      for_each = var.subnetwork_project == null ? [1] : []
-      content {}
-    }
-  }
-}

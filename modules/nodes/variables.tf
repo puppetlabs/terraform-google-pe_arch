@@ -10,26 +10,21 @@ variable "user" {
 variable "ssh_key" {
   description = "Location on disk of the SSH public key to be used for instance SSH access"
   type        = string
+  default     = "~/.ssh/id_rsa.pub"
 }
 variable "zones" {
   description = "GCP zone that are within the defined GCP region that you wish to use"
   type        = list(string)
 }
-variable "compiler_count" {
-  description = "The quantity of compilers that are deployed behind a load balancer and will be spread across defined zones"
-  type        = number
-}
-variable "server_count" {
+variable "node_count" {
   description = "The quantity of nodes that are deployed within the environment for testing"
   type        = number
-}
-variable "database_count" {
-  description = "The quantity of nodes that are deployed within the environment for testing"
-  type        = number
+  default     = 1
 }
 variable "instance_image" {
   description = "The disk image to use when deploying new cloud instances"
   type        = string
+  default     = "almalinux-cloud/almalinux-8"
 }
 variable "labels" {
   description = "A list of labels that will be applied to virtual instances"
@@ -52,38 +47,26 @@ variable network    {
 variable subnetwork {
   description = "Regional subnetwork assigned to VPC network provisioned by the networking submodule"
   type        = string
+  default     = null
 }
 variable subnetwork_project {
   description = "Regional subnetwork project assigned to VPC network provisioned by the networking submodule"
   type        = string
+  default     = null
 }
 variable "id" {
   description = "Randomly generated value used to produce unique names for everything to prevent collisions and visually link resources together"
   type        = string
 }
-variable "compiler_type" {
+variable "node_type" {
   description = "Instance type of compilers"
   type        = string
+  default     = "n1-standard-1"
 }
-variable "primary_type" {
-  description = "Instance type of primary and replica"
-  type        = string
-}
-variable "database_type" {
-  description = "Instance type of PuppetDB database and replica"
-  type        = string
-}
-variable "compiler_disk" {
+variable "node_disk" {
   description = "Instance disk size of compilers"
-  type        = string
-}
-variable "primary_disk" {
-  description = "Instance disk size of primary and replica"
-  type        = string
-}
-variable "database_disk" {
-  description = "Instance disk size of PuppetDB database and replica"
-  type        = string
+  type        = number
+  default     = 20
 }
 variable "domain_name" {
   description = "Custom domain to use for internalDNS"

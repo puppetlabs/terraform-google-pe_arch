@@ -21,11 +21,6 @@ variable "compiler_count" {
   type        = number
   default     = 1
 }
-variable "node_count" {
-  description = "The quantity of nodes that are deployed within the environment for testing"
-  type        = number
-  default     = 0
-}
 variable "instance_image" {
   description = "The disk image to use when deploying new cloud instances"
   type        = string
